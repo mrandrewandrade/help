@@ -1,10 +1,10 @@
-# Search Support
+# SOS — Search-Oriented Support
 
-A playful, shareable search demonstration: familiar search-engine clarity mixed with an overqualified AI assistant.
+A playful, shareable search demonstration powered by True AI: Andrade Intelligence.
 
 ## How it works
 
-Open the site, enter a question, and copy the generated link. Shared links use the `?q=` query parameter, animate the question and a simulated AI reasoning sequence, then continue to Google search results.
+Open the site, enter a question, and copy the generated link. Shared links use the `?q=` query parameter, run an unnecessarily elaborate progress sequence, then continue to Google search results.
 
 The AI sequence is intentionally theatrical and runs entirely in the browser. No question is sent anywhere until the page redirects to Google.
 

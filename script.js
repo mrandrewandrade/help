@@ -2,6 +2,34 @@
   "use strict";
 
   const GOOGLE_SEARCH = "https://www.google.com/search?q=";
+  const FINAL_LINE = "Don’t let the feed farm you… farming Google for you to find the answer.";
+  const STATUS_POOL = [
+    "Converting your question to JSON to confuse you…",
+    "Tokenizing the tokens…",
+    "Checking 8 billion model parameters… None of them know.",
+    "Consulting the cloud… Weather API unavailable.",
+    "Checking if Bing would help… Wrong answers always.",
+    "Adding an unnecessary em dash—complete.",
+    "Increasing model confidence… Suspiciously high.",
+    "Searching for the search engine… Found it.",
+    "Downloading more RAM… Complete.",
+    "Removing hallucinations… Error: created more.",
+    "Downloading the entire internet… You are out of disk space.",
+    "Generating a thoughtful answer… Redirecting instead.",
+    "Loading empathy module… Module failed.",
+    "Reading the flipping manual… answer found.",
+    "Checking if rubber duck was added to the support support ticket.",
+    "Ask better questions… Helping with this one anyway.",
+    "The way not found… creating the way.",
+    "Working with reality, not against it… Reality involves searching.",
+    "Hack the problem… Opening the easiest available tool.",
+    "Skill is built, not wished for… Search skill still in development.",
+    "Those can’t do teach… because those who can’t do learn.",
+    "Requestion the question… will redirect you to find the requestion.",
+    "Progress over perfection… almost there…",
+    "Asking Gemini for a gem… Complete.",
+    "Uninstalling Linux Mint… Complete."
+  ];
 
   function init() {
     const app = document.getElementById("app");
@@ -13,24 +41,17 @@
     const copy = document.querySelector("[data-copy]");
     const clear = document.querySelector("[data-clear]");
     const validation = document.querySelector("[data-validation]");
-    const agentLabel = document.querySelector("[data-agent-label]");
-    const steps = [...document.querySelectorAll("[data-step]")];
-    const answer = document.querySelector("[data-answer]");
-    const handoff = document.querySelector("[data-handoff]");
-    const countdown = document.querySelector("[data-countdown]");
+    const processor = document.querySelector("[data-processor]");
+    const progress = document.querySelector("[data-progress]");
+    const progressFill = document.querySelector("[data-progress-fill]");
+    const percent = document.querySelector("[data-percent]");
+    const status = document.querySelector("[data-status]");
     const googleLink = document.querySelector("[data-google-link]");
-    const cancel = document.querySelector("[data-cancel]");
     const shareOutput = document.querySelector("[data-share-output]");
+    const brandCursor = document.querySelector("[data-brand-cursor]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let timers = [];
-    let redirectCancelled = false;
 
-    const later = (callback, delay) => {
-      const id = window.setTimeout(callback, delay);
-      timers.push(id);
-      return id;
-    };
-    const clearTimers = () => { timers.forEach(window.clearTimeout); timers = []; };
     const clean = value => String(value || "").trim().replace(/\s+/g, " ").slice(0, 300);
     const googleUrl = query => GOOGLE_SEARCH + encodeURIComponent(query);
     const shareUrl = query => {
@@ -40,69 +61,53 @@
       if (query) url.searchParams.set("q", query);
       return url.toString();
     };
+    const later = (callback, delay) => {
+      const id = window.setTimeout(callback, delay);
+      timers.push(id);
+    };
+    const clearTimers = () => {
+      timers.forEach(window.clearTimeout);
+      timers = [];
+    };
 
-    function resetSteps() {
-      steps.forEach((step, index) => {
-        step.className = "";
-        step.querySelector("small").textContent = "Waiting";
-        step.querySelector(".step-icon").textContent = String(index + 1);
-      });
-      answer.hidden = true;
-      handoff.hidden = true;
+    function shuffledStatuses() {
+      const pool = [...STATUS_POOL];
+      for (let index = pool.length - 1; index > 0; index -= 1) {
+        const swap = Math.floor(Math.random() * (index + 1));
+        [pool[index], pool[swap]] = [pool[swap], pool[index]];
+      }
+      return ["Booting up the server…", ...pool.slice(0, 7), "Preparing one expertly phrased search…", "Rewriting to teh original question…", FINAL_LINE];
+    }
+
+    function setProgress(value) {
+      const bounded = Math.max(0, Math.min(100, value));
+      progressFill.style.transform = `scaleX(${bounded / 100})`;
+      progress.setAttribute("aria-valuenow", String(Math.round(bounded)));
+      percent.textContent = `${Math.round(bounded)}%`;
     }
 
     function updateShare() {
       const query = clean(input.value);
-      shareOutput.textContent = query ? shareUrl(query) : "Type a question to generate a link.";
+      shareOutput.textContent = query ? shareUrl(query) : "Type a question to create a shareable support link.";
       validation.hidden = true;
     }
 
-    function restore(message) {
-      clearTimers();
-      redirectCancelled = true;
-      app.dataset.state = "idle";
-      input.disabled = false;
-      submit.disabled = false;
-      copy.disabled = false;
-      clear.disabled = false;
-      handoff.hidden = true;
-      agentLabel.textContent = message || "Handoff paused — human operator in control";
-      input.focus();
+    function finish(query) {
+      app.dataset.state = "searching";
+      brandCursor?.classList.remove("is-working");
+      brandCursor?.classList.add("is-searching");
+      googleLink.href = googleUrl(query);
+      later(() => window.location.assign(googleUrl(query)), reducedMotion ? 100 : 1300);
     }
 
-    function typeQuery(query, index, done) {
-      input.value = query.slice(0, index);
-      if (index >= query.length) return done();
-      later(() => typeQuery(query, index + 1, done), reducedMotion ? 0 : Math.max(25, 58 - query.length / 9));
-    }
-
-    function runSteps(query, index) {
-      if (index >= steps.length) {
-        agentLabel.textContent = "Recommendation ready";
-        answer.hidden = false;
-        later(() => beginHandoff(query), reducedMotion ? 80 : 700);
+    function runStatuses(query, messages, index) {
+      if (index >= messages.length) {
+        finish(query);
         return;
       }
-
-      const step = steps[index];
-      step.classList.add("is-active");
-      step.querySelector("small").textContent = index === 1 ? "Reasoning" : "Working";
-      agentLabel.textContent = ["Reading context", "Thinking very deeply", "Selecting a tool", "Breakthrough detected"][index];
-      later(() => {
-        step.classList.remove("is-active");
-        step.classList.add("is-done");
-        step.querySelector("small").textContent = "Done";
-        runSteps(query, index + 1);
-      }, reducedMotion ? 40 : 620 + index * 90);
-    }
-
-    function beginHandoff(query) {
-      const destination = googleUrl(query);
-      googleLink.href = destination;
-      handoff.hidden = false;
-      app.dataset.state = "handoff";
-      [3, 2, 1].forEach((number, index) => later(() => { countdown.textContent = String(number); }, index * 1000));
-      later(() => { if (!redirectCancelled) window.location.assign(destination); }, 3000);
+      status.textContent = messages[index];
+      setProgress(((index + 1) / messages.length) * 100);
+      later(() => runStatuses(query, messages, index + 1), reducedMotion ? 35 : (index === messages.length - 1 ? 1200 : 620));
     }
 
     function demonstrate(rawQuery) {
@@ -114,24 +119,20 @@
       }
 
       clearTimers();
-      resetSteps();
-      redirectCancelled = false;
-      validation.hidden = true;
+      window.history.replaceState(null, "", shareUrl(query));
+      shareOutput.textContent = shareUrl(query);
+      googleLink.href = googleUrl(query);
       input.disabled = true;
       submit.disabled = true;
       copy.disabled = true;
       clear.disabled = true;
-      input.value = "";
-      app.dataset.state = "typing";
-      agentLabel.textContent = "Receiving question";
-      window.history.replaceState(null, "", shareUrl(query));
-      shareOutput.textContent = shareUrl(query);
-
-      later(() => typeQuery(query, 0, () => {
-        app.dataset.state = "thinking";
-        agentLabel.textContent = "Question received";
-        later(() => runSteps(query, 0), reducedMotion ? 30 : 350);
-      }), reducedMotion ? 0 : 350);
+      validation.hidden = true;
+      processor.hidden = false;
+      app.dataset.state = "working";
+      brandCursor?.classList.remove("is-searching");
+      brandCursor?.classList.add("is-working");
+      setProgress(0);
+      runStatuses(query, shuffledStatuses(), 0);
     }
 
     async function copyLink() {
@@ -144,28 +145,39 @@
       const url = shareUrl(query);
       try {
         await navigator.clipboard.writeText(url);
-        copy.textContent = "Helpful link copied";
-        agentLabel.textContent = "Link copied — deploy responsibly";
+        copy.textContent = "Support link copied";
       } catch (_error) {
         window.prompt("Copy this link:", url);
-        agentLabel.textContent = "Manual copy protocol activated";
       }
       shareOutput.textContent = url;
-      later(() => { copy.textContent = "Copy a helpful link"; }, 1800);
+      later(() => { copy.textContent = "Copy support link"; }, 1600);
     }
 
-    form.addEventListener("submit", event => { event.preventDefault(); demonstrate(input.value); });
+    if (!reducedMotion && window.matchMedia("(pointer: fine)").matches && brandCursor) {
+      document.body.classList.add("has-brand-cursor");
+      window.addEventListener("pointermove", event => {
+        brandCursor.style.left = `${event.clientX}px`;
+        brandCursor.style.top = `${event.clientY}px`;
+      }, { passive: true });
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      demonstrate(input.value);
+    });
     input.addEventListener("input", updateShare);
     copy.addEventListener("click", copyLink);
-    clear.addEventListener("click", () => { input.value = ""; updateShare(); input.focus(); });
-    cancel.addEventListener("click", () => restore());
+    clear.addEventListener("click", () => {
+      input.value = "";
+      updateShare();
+      input.focus();
+    });
 
     const initialQuery = clean(new URLSearchParams(window.location.search).get("q"));
-    resetSteps();
     if (initialQuery) {
       input.value = initialQuery;
-      shareOutput.textContent = shareUrl(initialQuery);
-      demonstrate(initialQuery);
+      updateShare();
+      later(() => demonstrate(initialQuery), reducedMotion ? 0 : 450);
     }
   }
 
