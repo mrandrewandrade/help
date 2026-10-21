@@ -1,6 +1,6 @@
 # SOS — Search-Oriented Support
 
-A playful, shareable search demonstration powered by True AI: Andrade Intelligence.
+A playful, shareable search demonstration powered by AI: Andraoid Intelligence.
 
 ## How it works
 

@@ -4,55 +4,47 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SOS: an unnecessarily intelligent way to prepare one ordinary Google search.">
-  <meta name="theme-color" content="#f4f1ea">
-  <title>SOS — True AI</title>
+  <meta name="theme-color" content="#ffffff">
+  <title>SOS — Search-Oriented Support</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
 </head>
 <body>
   <div class="brand-cursor" data-brand-cursor aria-hidden="true">
-    <img src="https://andrewandrade.ca/tech-edu-resources/assets/branding/logo/aa-logo.svg" alt="">
-    <span class="cursor-search"></span>
+    <svg viewBox="0 0 90 110" role="presentation">
+      <path class="cursor-shadow" d="M8 5v82l19-19 14 33 18-8-14-32h31z"/>
+      <path class="cursor-face" d="M12 14v63l16-16 15 34 10-5-15-35h25z"/>
+      <path class="cursor-aa" d="M17 47 30 30l13 17M30 30v31M21 44q9-5 18 0"/>
+    </svg>
   </div>
 
-  <header class="site-header">
-    <a class="brand" href="./" aria-label="SOS home">
-      <img src="https://andrewandrade.ca/tech-edu-resources/assets/branding/logo/aa-logo.svg" alt="">
-      <span><strong>TRUE AI</strong><small>Andrade Intelligence</small></span>
-    </a>
-    <span class="system-name">A new learning language model by Andrew Andrade</span>
-  </header>
-
   <main id="app" class="app" data-state="idle">
-    <section class="hero" aria-labelledby="page-title">
-      <div class="logo-stage" aria-hidden="true">
-        <img class="hero-logo" src="https://andrewandrade.ca/tech-edu-resources/assets/branding/logo/aa-logo.svg" alt="">
-        <span class="hero-search"></span>
+    <section class="search-home" aria-labelledby="page-title">
+      <div class="wordmark" data-wordmark>
+        <h1 id="page-title"><span>S</span><span>O</span><span>S</span></h1>
+        <p class="definition"><strong>S.O.S.</strong><span>Search-Oriented Support</span></p>
+        <p class="intelligence">AI: Andraoid Intelligence</p>
+        <p class="system-result" aria-live="polite"><strong>System Overstimulated…</strong> Redirecting.</p>
       </div>
-      <p class="eyebrow">System Overstimulated and Crashed Out</p>
-      <h1 id="page-title">SOS</h1>
-      <p class="intro">An unnecessarily intelligent way to prepare one ordinary search.</p>
-    </section>
 
-    <section class="search-card" aria-label="Create a Search-Oriented Support link">
-      <form data-form novalidate>
-        <label for="query">What do you need help searching?</label>
+      <form class="search-form" data-form novalidate>
+        <label class="sr-only" for="query">What do you need help searching?</label>
         <div class="search-box">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
-          <input id="query" name="q" type="search" autocomplete="off" maxlength="300" placeholder="Enter the question that was one search away" required>
+          <input id="query" name="q" type="search" autocomplete="off" maxlength="300" placeholder="Search for help" required>
           <button class="clear" type="button" data-clear aria-label="Clear question">×</button>
         </div>
         <p class="validation" data-validation hidden>Please provide something for the intelligence to overprocess.</p>
         <div class="actions">
-          <button class="primary" type="submit">Engage True AI</button>
+          <button class="primary" type="submit">SOS Search</button>
           <button class="secondary" type="button" data-copy>Copy support link</button>
         </div>
       </form>
 
       <div class="processor" data-processor hidden>
         <div class="processor-heading">
-          <span>Andrade Intelligence Engine</span>
+          <span>Andraoid Intelligence Engine</span>
           <output data-percent>0%</output>
         </div>
         <div class="progress" role="progressbar" aria-label="Search preparation" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress>
@@ -66,9 +58,6 @@
     </section>
   </main>
 
-  <footer>
-    <span>Search-Oriented Support</span>
-    <span>Powered by True AI — Andrade Intelligence</span>
-  </footer>
+  <footer>AI: Andraoid Intelligence · A new learning language model by Andrew Andrade</footer>
 </body>
 </html>
