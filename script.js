@@ -51,6 +51,12 @@
     const brandCursor = document.querySelector("[data-brand-cursor]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     let timers = [];
+    let cursorTargetX = 0;
+    let cursorTargetY = 0;
+    let cursorX = 0;
+    let cursorY = 0;
+    let cursorResponsiveness = 0.42;
+    let cursorReady = false;
 
     const clean = value => String(value || "").trim().replace(/\s+/g, " ").slice(0, 300);
     const googleUrl = query => GOOGLE_SEARCH + encodeURIComponent(query);
@@ -84,6 +90,8 @@
       progressFill.style.transform = `scaleX(${bounded / 100})`;
       progress.setAttribute("aria-valuenow", String(Math.round(bounded)));
       percent.textContent = `${Math.round(bounded)}%`;
+      cursorResponsiveness = 0.42 - (bounded / 100) * 0.385;
+      brandCursor?.style.setProperty("--cursor-spin-speed", `${0.72 + (bounded / 100) * 2.2}s`);
     }
 
     function updateShare() {
@@ -156,9 +164,25 @@
     if (!reducedMotion && window.matchMedia("(pointer: fine)").matches && brandCursor) {
       document.body.classList.add("has-brand-cursor");
       window.addEventListener("pointermove", event => {
-        brandCursor.style.left = `${event.clientX}px`;
-        brandCursor.style.top = `${event.clientY}px`;
+        cursorTargetX = event.clientX;
+        cursorTargetY = event.clientY;
+        if (!cursorReady) {
+          cursorX = cursorTargetX;
+          cursorY = cursorTargetY;
+          cursorReady = true;
+        }
       }, { passive: true });
+
+      const animateCursor = () => {
+        if (cursorReady) {
+          cursorX += (cursorTargetX - cursorX) * cursorResponsiveness;
+          cursorY += (cursorTargetY - cursorY) * cursorResponsiveness;
+          brandCursor.style.left = `${cursorX}px`;
+          brandCursor.style.top = `${cursorY}px`;
+        }
+        window.requestAnimationFrame(animateCursor);
+      };
+      window.requestAnimationFrame(animateCursor);
     }
 
     form.addEventListener("submit", event => {

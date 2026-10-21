@@ -186,6 +186,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .app[data-state="searching"] .system-result { opacity: 1; transform: translate(-50%, 0); }
 
 .brand-cursor {
+  --cursor-spin-speed: .72s;
   display: none;
   height: 88px;
   left: 0;
@@ -212,7 +213,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .has-brand-cursor input { cursor: text; }
 .has-brand-cursor .brand-cursor { display: block; }
 .has-brand-cursor:has(input:hover) .brand-cursor { opacity: 0; }
-.brand-cursor.is-working { animation: cursor-spin .78s linear infinite; }
+.brand-cursor.is-working { animation: cursor-spin var(--cursor-spin-speed) linear infinite; }
 .brand-cursor.is-searching { animation: cursor-finish .52s ease both; }
 
 footer {
