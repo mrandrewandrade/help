@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="A friendly, shareable search demonstration with just enough artificial intelligence to be dramatic.">
+  <meta name="theme-color" content="#f8f9fc">
+  <title>Search Support</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="mini-brand" href="./" aria-label="Search Support home">
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span>Search Support</span>
+    </a>
+    <span class="header-note">Human question. Machine assistance. One search.</span>
+  </header>
+
+  <main id="app" class="app" data-state="idle">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="ai-badge"><span aria-hidden="true">✦</span> Search intelligence online</div>
+      <h1 id="page-title"><span>search</span><strong>support</strong></h1>
+      <p>A sophisticated AI-assisted system for discovering that the answer was one search away.</p>
+    </section>
+
+    <section class="search-stage" aria-label="Create a search support link">
+      <form class="search-form" data-form novalidate>
+        <label for="query">What needs searching?</label>
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
+          <input id="query" name="q" type="search" autocomplete="off" placeholder="Ask an extremely searchable question" maxlength="300" required>
+          <span class="typing-caret" aria-hidden="true"></span>
+          <button class="clear-button" type="button" data-clear aria-label="Clear search">×</button>
+        </div>
+        <p class="validation" data-validation hidden>Please enter a question. Even the AI needs something to work with.</p>
+        <div class="primary-actions">
+          <button class="button button-primary" type="submit"><span aria-hidden="true">✦</span> Ask Search Support</button>
+          <button class="button button-secondary" type="button" data-copy>Copy a helpful link</button>
+        </div>
+      </form>
+
+      <div class="agent" data-agent aria-live="polite">
+        <div class="agent-head">
+          <div class="agent-avatar" aria-hidden="true">AI</div>
+          <div><strong>Search Support Agent</strong><span data-agent-label>Ready when you are</span></div>
+          <span class="agent-dot" aria-hidden="true"></span>
+        </div>
+        <ol class="thoughts" data-thoughts>
+          <li data-step="1"><span class="step-icon">1</span><span>Read the question carefully</span><small>Waiting</small></li>
+          <li data-step="2"><span class="step-icon">2</span><span>Apply large-language-model reasoning</span><small>Waiting</small></li>
+          <li data-step="3"><span class="step-icon">3</span><span>Identify the appropriate research tool</span><small>Waiting</small></li>
+          <li data-step="4"><span class="step-icon">4</span><span>Discover the search box</span><small>Waiting</small></li>
+        </ol>
+        <div class="agent-answer" data-answer hidden>
+          <span class="answer-spark" aria-hidden="true">✦</span>
+          <div><strong>Analysis complete.</strong><p>This calls for one expertly prepared web search.</p></div>
+        </div>
+      </div>
+
+      <div class="handoff" data-handoff hidden>
+        <div><strong>Search prepared.</strong><span>Opening results in <b data-countdown>3</b>…</span></div>
+        <div class="progress" aria-hidden="true"><span></span></div>
+        <div class="handoff-actions"><a data-google-link href="https://www.google.com/">Open results now</a><button type="button" data-cancel>Pause the dramatic handoff</button></div>
+      </div>
+    </section>
+
+    <section class="share-card" aria-labelledby="share-title">
+      <div class="share-number" aria-hidden="true">01</div>
+      <div><p class="eyebrow">SHAREABLE SUPPORT</p><h2 id="share-title">Send the lesson, not just the answer.</h2></div>
+      <p>Type a question and copy the link. When it opens, Search Support performs an unnecessarily advanced analysis before handing the question to Google.</p>
+      <output data-share-output>Type a question to generate a link.</output>
+    </section>
+
+    <p class="privacy-note"><span aria-hidden="true">◉</span> The AI sequence is playful theatre. Your query stays in the browser until you continue to Google.</p>
+  </main>
+
+  <footer><span>Search Support</span><span>Kindness setting: lightly toasted.</span></footer>
+</body>
+</html>
