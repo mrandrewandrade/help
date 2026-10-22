@@ -1,10 +1,10 @@
-# SOS — Search-Oriented Support
+# SOS — Search Oriented Support
 
 A playful, shareable search demonstration powered by AI: Andraoid Intelligence.
 
 ## How it works
 
-Open the site, enter a question, and copy the generated link. Shared links use the `?q=` query parameter, run an unnecessarily elaborate progress sequence, then continue to Google search results.
+Open the site, enter a question, and use **SOS Lost** to copy the generated link. Shared links use the `?q=` query parameter, animate the AA cursor typing the question, run an unnecessarily elaborate progress sequence, then continue to Google search results.
 
 The AI sequence is intentionally theatrical and runs entirely in the browser. No question is sent anywhere until the page redirects to Google.
 

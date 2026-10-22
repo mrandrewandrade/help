@@ -5,17 +5,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SOS: an unnecessarily intelligent way to prepare one ordinary Google search.">
   <meta name="theme-color" content="#ffffff">
-  <title>SOS — Search-Oriented Support</title>
+  <title>SOS — Search Oriented Support</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
 </head>
 <body>
   <div class="brand-cursor" data-brand-cursor aria-hidden="true">
-    <svg viewBox="0 0 90 110" role="presentation">
-      <path class="cursor-shadow" d="M8 5v82l19-19 14 33 18-8-14-32h31z"/>
-      <path class="cursor-face" d="M12 14v63l16-16 15 34 10-5-15-35h25z"/>
-      <path class="cursor-aa" d="M17 47 30 30l13 17M30 30v31M21 44q9-5 18 0"/>
+    <svg viewBox="0 0 64 64" role="presentation">
+      <g transform="rotate(-45 32 32)">
+        <path class="cursor-aa-outline" d="M8 31 32 7l24 24M32 8v49M15 27q17-9 34 0"/>
+        <path class="cursor-aa-face" d="M8 31 32 7l24 24M32 8v49M15 27q17-9 34 0"/>
+      </g>
     </svg>
   </div>
 
@@ -23,8 +24,7 @@
     <section class="search-home" aria-labelledby="page-title">
       <div class="wordmark" data-wordmark>
         <h1 id="page-title"><span>S</span><span>O</span><span>S</span></h1>
-        <p class="definition"><strong>S.O.S.</strong><span>Search-Oriented Support</span></p>
-        <p class="intelligence">AI: Andraoid Intelligence</p>
+        <p class="definition">Search Oriented Support</p>
         <p class="system-result" aria-live="polite"><strong>System Overstimulated…</strong> Redirecting.</p>
       </div>
 
@@ -37,9 +37,10 @@
         </div>
         <p class="validation" data-validation hidden>Please provide something for the intelligence to overprocess.</p>
         <div class="actions">
-          <button class="primary" type="submit">SOS Search</button>
-          <button class="secondary" type="button" data-copy>Copy support link</button>
+          <button class="secondary" type="button" data-copy aria-label="Copy an SOS support link">SOS Lost</button>
+          <button class="primary" type="submit">SOS Find</button>
         </div>
+        <p class="powered-by">Powered by <strong>AI: Andraoid Intelligence</strong><span>A new learning language model by Andrew Andrade</span></p>
       </form>
 
       <div class="processor" data-processor hidden>
@@ -54,10 +55,8 @@
         <a class="skip" data-google-link href="https://www.google.com/">Skip the intelligence</a>
       </div>
 
-      <output class="share-output" data-share-output>Type a question to create a shareable support link.</output>
+      <output class="share-output" data-share-output></output>
     </section>
   </main>
-
-  <footer>AI: Andraoid Intelligence · A new learning language model by Andrew Andrade</footer>
 </body>
 </html>

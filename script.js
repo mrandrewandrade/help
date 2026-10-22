@@ -57,6 +57,7 @@
     let cursorY = 0;
     let cursorResponsiveness = 0.42;
     let cursorReady = false;
+    let cursorAutopilot = false;
 
     const clean = value => String(value || "").trim().replace(/\s+/g, " ").slice(0, 300);
     const googleUrl = query => GOOGLE_SEARCH + encodeURIComponent(query);
@@ -94,9 +95,7 @@
       brandCursor?.style.setProperty("--cursor-spin-speed", `${0.72 + (bounded / 100) * 2.2}s`);
     }
 
-    function updateShare() {
-      const query = clean(input.value);
-      shareOutput.textContent = query ? shareUrl(query) : "Type a question to create a shareable support link.";
+    function updateInput() {
       validation.hidden = true;
     }
 
@@ -105,7 +104,7 @@
       brandCursor?.classList.remove("is-working");
       brandCursor?.classList.add("is-searching");
       googleLink.href = googleUrl(query);
-      later(() => window.location.assign(googleUrl(query)), reducedMotion ? 100 : 1300);
+      later(() => window.location.assign(googleUrl(query)), reducedMotion ? 100 : 2200);
     }
 
     function runStatuses(query, messages, index) {
@@ -115,7 +114,7 @@
       }
       status.textContent = messages[index];
       setProgress(((index + 1) / messages.length) * 100);
-      later(() => runStatuses(query, messages, index + 1), reducedMotion ? 35 : (index === messages.length - 1 ? 1200 : 620));
+      later(() => runStatuses(query, messages, index + 1), reducedMotion ? 35 : (index === messages.length - 1 ? 2800 : 1900));
     }
 
     function demonstrate(rawQuery) {
@@ -128,7 +127,6 @@
 
       clearTimers();
       window.history.replaceState(null, "", shareUrl(query));
-      shareOutput.textContent = shareUrl(query);
       googleLink.href = googleUrl(query);
       input.disabled = true;
       submit.disabled = true;
@@ -143,6 +141,55 @@
       runStatuses(query, shuffledStatuses(), 0);
     }
 
+    function moveCursorTo(element, xRatio = 0.5, yRatio = 0.5) {
+      const bounds = element.getBoundingClientRect();
+      cursorTargetX = bounds.left + bounds.width * xRatio;
+      cursorTargetY = bounds.top + bounds.height * yRatio;
+    }
+
+    function typeSharedQuery(query, index = 0) {
+      if (index >= query.length) {
+        later(() => {
+          cursorResponsiveness = 0.075;
+          moveCursorTo(submit);
+        }, 650);
+        later(() => {
+          cursorAutopilot = false;
+          brandCursor?.classList.remove("is-autopilot");
+          demonstrate(query);
+        }, 1750);
+        return;
+      }
+
+      input.value += query[index];
+      later(() => typeSharedQuery(query, index + 1), 62 + Math.random() * 58);
+    }
+
+    function stageSharedQuery(query) {
+      input.value = "";
+      if (reducedMotion || !brandCursor || !document.body.classList.contains("has-brand-cursor")) {
+        input.value = query;
+        demonstrate(query);
+        return;
+      }
+
+      const mark = document.querySelector("[data-wordmark]").getBoundingClientRect();
+      cursorAutopilot = true;
+      cursorReady = true;
+      cursorX = mark.right - 40;
+      cursorY = mark.top + mark.height * 0.5;
+      cursorTargetX = cursorX;
+      cursorTargetY = cursorY;
+      cursorResponsiveness = 0.08;
+      brandCursor.classList.add("is-autopilot");
+
+      later(() => moveCursorTo(input, 0.28), 450);
+      later(() => {
+        input.focus();
+        typeSharedQuery(query);
+      }, 1700);
+    }
+
     async function copyLink() {
       const query = clean(input.value);
       if (!query) {
@@ -153,17 +200,18 @@
       const url = shareUrl(query);
       try {
         await navigator.clipboard.writeText(url);
-        copy.textContent = "Support link copied";
+        copy.textContent = "SOS link copied";
       } catch (_error) {
         window.prompt("Copy this link:", url);
       }
       shareOutput.textContent = url;
-      later(() => { copy.textContent = "Copy support link"; }, 1600);
+      later(() => { copy.textContent = "SOS Lost"; }, 1600);
     }
 
     if (!reducedMotion && window.matchMedia("(pointer: fine)").matches && brandCursor) {
       document.body.classList.add("has-brand-cursor");
       window.addEventListener("pointermove", event => {
+        if (cursorAutopilot) return;
         cursorTargetX = event.clientX;
         cursorTargetY = event.clientY;
         if (!cursorReady) {
@@ -189,19 +237,17 @@
       event.preventDefault();
       demonstrate(input.value);
     });
-    input.addEventListener("input", updateShare);
+    input.addEventListener("input", updateInput);
     copy.addEventListener("click", copyLink);
     clear.addEventListener("click", () => {
       input.value = "";
-      updateShare();
+      updateInput();
       input.focus();
     });
 
     const initialQuery = clean(new URLSearchParams(window.location.search).get("q"));
     if (initialQuery) {
-      input.value = initialQuery;
-      updateShare();
-      later(() => demonstrate(initialQuery), reducedMotion ? 0 : 450);
+      later(() => stageSharedQuery(initialQuery), reducedMotion ? 0 : 500);
     }
   }
 
