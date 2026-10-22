@@ -1,4 +1,4 @@
-# SOS — Search Oriented Support
+# S.O.S. | Search Oriented Support
 
 A playful, shareable search demonstration powered by AI: Andraoid Intelligence.
 
