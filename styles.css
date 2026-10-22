@@ -261,6 +261,9 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .has-brand-cursor input { cursor: text; }
 .has-brand-cursor .brand-cursor { display: block; }
 .has-brand-cursor:has(input:hover) .brand-cursor { opacity: 0; }
+.has-brand-cursor:has(input:hover) .brand-cursor.is-autopilot,
+.has-brand-cursor:has(input:hover) .brand-cursor.is-working,
+.has-brand-cursor:has(input:hover) .brand-cursor.is-searching { opacity: 1; }
 .brand-cursor.is-working { animation: cursor-spin var(--cursor-spin-speed) linear infinite; }
 .brand-cursor.is-searching { animation: cursor-finish .52s ease both; }
 
