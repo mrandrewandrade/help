@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="SOS: an unnecessarily intelligent way to prepare one ordinary Google search.">
   <meta name="theme-color" content="#ffffff">
-  <title>SOS — Search Oriented Support</title>
+  <title>SOS — Search Oriented Shortcut</title>
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
   <script src="script.js" defer></script>
@@ -24,21 +24,25 @@
     <section class="search-home" aria-labelledby="page-title">
       <div class="wordmark" data-wordmark>
         <h1 id="page-title"><span>S</span><span>O</span><span>S</span></h1>
-        <p class="definition">Search Oriented Support</p>
+        <p class="definition">Search Oriented Shortcut</p>
         <p class="system-result" aria-live="polite"><strong>System Overstimulated…</strong> Redirecting.</p>
       </div>
 
       <form class="search-form" data-form novalidate>
-        <label class="sr-only" for="query">What do you need help searching?</label>
+        <label class="sr-only" for="query">What should we search for?</label>
         <div class="search-box">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z"/></svg>
-          <input id="query" name="q" type="search" autocomplete="off" maxlength="300" placeholder="Search for help" required>
+          <input id="query" name="q" type="search" autocomplete="off" maxlength="300" placeholder="Search for something" required>
+          <div class="search-tools">
+            <button class="sound-toggle" type="button" data-sound aria-label="Toggle typing sounds" aria-pressed="true" title="Typing sounds on">♪</button>
+            <a class="ai-mode" href="https://www.youtube.com/watch?v=nZ-IGlZKECI" target="_blank" rel="noopener noreferrer" title="AI Stepover mode — opens YouTube"><span aria-hidden="true">✦</span> AI Stepover</a>
+          </div>
           <button class="clear" type="button" data-clear aria-label="Clear question">×</button>
         </div>
         <p class="validation" data-validation hidden>Please provide something for the intelligence to overprocess.</p>
         <div class="actions">
-          <button class="secondary" type="button" data-copy aria-label="Copy an SOS support link">SOS Lost</button>
-          <button class="primary" type="submit">SOS Find</button>
+          <button class="primary" type="submit">SOS Found</button>
+          <button class="secondary" type="button" data-copy aria-label="Copy an SOS search link">SOS Lost</button>
         </div>
         <p class="powered-by">Powered by <strong>AI: Andraoid Intelligence</strong><span>A new learning language model by Andrew Andrade</span></p>
       </form>
@@ -51,7 +55,7 @@
         <div class="progress" role="progressbar" aria-label="Search preparation" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" data-progress>
           <span data-progress-fill></span>
         </div>
-        <p class="status" data-status aria-live="polite">Booting up the server…</p>
+        <div class="status-log" data-status aria-live="polite" aria-label="Andraoid Intelligence activity"></div>
         <a class="skip" data-google-link href="https://www.google.com/">Skip the intelligence</a>
       </div>
 

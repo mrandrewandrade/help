@@ -40,17 +40,22 @@
     const submit = form.querySelector('[type="submit"]');
     const copy = document.querySelector("[data-copy]");
     const clear = document.querySelector("[data-clear]");
+    const soundToggle = document.querySelector("[data-sound]");
     const validation = document.querySelector("[data-validation]");
     const processor = document.querySelector("[data-processor]");
     const progress = document.querySelector("[data-progress]");
     const progressFill = document.querySelector("[data-progress-fill]");
     const percent = document.querySelector("[data-percent]");
-    const status = document.querySelector("[data-status]");
+    const statusLog = document.querySelector("[data-status]");
     const googleLink = document.querySelector("[data-google-link]");
     const shareOutput = document.querySelector("[data-share-output]");
     const brandCursor = document.querySelector("[data-brand-cursor]");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const finePointer = window.matchMedia("(pointer: fine)").matches;
     let timers = [];
+    let currentQuery = "";
+    let soundEnabled = true;
+    let audioContext = null;
     let cursorTargetX = 0;
     let cursorTargetY = 0;
     let cursorX = 0;
@@ -71,11 +76,44 @@
     const later = (callback, delay) => {
       const id = window.setTimeout(callback, delay);
       timers.push(id);
+      return id;
     };
     const clearTimers = () => {
       timers.forEach(window.clearTimeout);
       timers = [];
     };
+
+    function ensureAudio() {
+      if (!soundEnabled) return null;
+      try {
+        if (!audioContext) {
+          const AudioContext = window.AudioContext || window.webkitAudioContext;
+          if (!AudioContext) return null;
+          audioContext = new AudioContext();
+        }
+        if (audioContext.state === "suspended") audioContext.resume().catch(() => {});
+        return audioContext;
+      } catch (_error) {
+        return null;
+      }
+    }
+
+    function playTypingSound(character) {
+      if (!soundEnabled || !character || /\s/.test(character)) return;
+      const context = ensureAudio();
+      if (!context || context.state !== "running") return;
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      const now = context.currentTime;
+      oscillator.type = "square";
+      oscillator.frequency.setValueAtTime(390 + Math.random() * 170, now);
+      gain.gain.setValueAtTime(0.012, now);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.024);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(now);
+      oscillator.stop(now + 0.026);
+    }
 
     function shuffledStatuses() {
       const pool = [...STATUS_POOL];
@@ -99,22 +137,74 @@
       validation.hidden = true;
     }
 
-    function finish(query) {
+    function moveCursorTo(element, xRatio = 0.5, yRatio = 0.5) {
+      if (!element) return;
+      const bounds = element.getBoundingClientRect();
+      cursorTargetX = bounds.left + bounds.width * xRatio;
+      cursorTargetY = bounds.top + bounds.height * yRatio;
+    }
+
+    function beginRedirect(query, delay = 1500) {
+      clearTimers();
+      currentQuery = clean(query);
+      const destination = googleUrl(currentQuery);
+      googleLink.href = destination;
       app.dataset.state = "searching";
-      brandCursor?.classList.remove("is-working");
+      brandCursor?.classList.remove("is-working", "is-autopilot");
       brandCursor?.classList.add("is-searching");
-      googleLink.href = googleUrl(query);
-      later(() => window.location.assign(googleUrl(query)), reducedMotion ? 100 : 2200);
+
+      if (!reducedMotion && finePointer && brandCursor) {
+        cursorAutopilot = true;
+        cursorResponsiveness = 0.075;
+        moveCursorTo(googleLink, 0.5, 0.5);
+        later(() => { cursorTargetY += 6; }, 280);
+      }
+      later(() => window.location.assign(destination), reducedMotion ? 100 : delay);
+    }
+
+    function appendStatus(message, onComplete) {
+      const line = document.createElement("p");
+      const marker = document.createElement("span");
+      const text = document.createElement("span");
+      line.className = "status-line is-active";
+      marker.className = "status-marker";
+      marker.setAttribute("aria-hidden", "true");
+      marker.textContent = "✦";
+      line.append(marker, text);
+      statusLog.append(line);
+      statusLog.scrollTop = statusLog.scrollHeight;
+      let index = 0;
+
+      const typeNext = () => {
+        if (index >= message.length) {
+          line.classList.remove("is-active");
+          line.classList.add("is-complete");
+          later(onComplete, 900);
+          return;
+        }
+        const character = message[index];
+        text.textContent += character;
+        if (index % 2 === 0) playTypingSound(character);
+        index += 1;
+        statusLog.scrollTop = statusLog.scrollHeight;
+        later(typeNext, reducedMotion ? 2 : 24 + Math.random() * 28);
+      };
+      typeNext();
     }
 
     function runStatuses(query, messages, index) {
       if (index >= messages.length) {
-        finish(query);
+        beginRedirect(query, 2200);
         return;
       }
-      status.textContent = messages[index];
       setProgress(((index + 1) / messages.length) * 100);
-      later(() => runStatuses(query, messages, index + 1), reducedMotion ? 35 : (index === messages.length - 1 ? 2800 : 1900));
+      appendStatus(messages[index], () => {
+        later(() => runStatuses(query, messages, index + 1), index === messages.length - 1 ? 1700 : 250);
+      });
+    }
+
+    function startThinking(query) {
+      runStatuses(query, shuffledStatuses(), 0);
     }
 
     function demonstrate(rawQuery) {
@@ -126,6 +216,7 @@
       }
 
       clearTimers();
+      currentQuery = query;
       window.history.replaceState(null, "", shareUrl(query));
       googleLink.href = googleUrl(query);
       input.disabled = true;
@@ -134,17 +225,25 @@
       clear.disabled = true;
       validation.hidden = true;
       processor.hidden = false;
+      statusLog.replaceChildren();
       app.dataset.state = "working";
       brandCursor?.classList.remove("is-searching");
       brandCursor?.classList.add("is-working");
       setProgress(0);
-      runStatuses(query, shuffledStatuses(), 0);
-    }
 
-    function moveCursorTo(element, xRatio = 0.5, yRatio = 0.5) {
-      const bounds = element.getBoundingClientRect();
-      cursorTargetX = bounds.left + bounds.width * xRatio;
-      cursorTargetY = bounds.top + bounds.height * yRatio;
+      if (!reducedMotion && finePointer && brandCursor) {
+        cursorAutopilot = true;
+        cursorResponsiveness = 0.085;
+        moveCursorTo(processor, 0.08, 0.08);
+        later(() => { cursorTargetY += 8; }, 330);
+        later(() => {
+          cursorTargetY -= 8;
+          cursorAutopilot = false;
+          startThinking(query);
+        }, 850);
+      } else {
+        later(() => startThinking(query), reducedMotion ? 0 : 350);
+      }
     }
 
     function typeSharedQuery(query, index = 0) {
@@ -153,15 +252,14 @@
           cursorResponsiveness = 0.075;
           moveCursorTo(submit);
         }, 650);
-        later(() => {
-          cursorAutopilot = false;
-          brandCursor?.classList.remove("is-autopilot");
-          demonstrate(query);
-        }, 1750);
+        later(() => { cursorTargetY += 6; }, 1450);
+        later(() => demonstrate(query), 1750);
         return;
       }
 
-      input.value += query[index];
+      const character = query[index];
+      input.value += character;
+      playTypingSound(character);
       later(() => typeSharedQuery(query, index + 1), 62 + Math.random() * 58);
     }
 
@@ -184,10 +282,12 @@
       brandCursor.classList.add("is-autopilot");
 
       later(() => moveCursorTo(input, 0.28), 450);
+      later(() => { cursorTargetY += 7; }, 1450);
       later(() => {
+        cursorTargetY -= 7;
         input.focus();
         typeSharedQuery(query);
-      }, 1700);
+      }, 1750);
     }
 
     async function copyLink() {
@@ -208,7 +308,7 @@
       later(() => { copy.textContent = "SOS Lost"; }, 1600);
     }
 
-    if (!reducedMotion && window.matchMedia("(pointer: fine)").matches && brandCursor) {
+    if (!reducedMotion && finePointer && brandCursor) {
       document.body.classList.add("has-brand-cursor");
       window.addEventListener("pointermove", event => {
         if (cursorAutopilot) return;
@@ -233,22 +333,39 @@
       window.requestAnimationFrame(animateCursor);
     }
 
+    document.addEventListener("pointerdown", ensureAudio, { once: true, capture: true });
+    document.addEventListener("keydown", ensureAudio, { once: true, capture: true });
     form.addEventListener("submit", event => {
       event.preventDefault();
       demonstrate(input.value);
     });
     input.addEventListener("input", updateInput);
+    input.addEventListener("keydown", event => {
+      if (event.key.length === 1) playTypingSound(event.key);
+    });
     copy.addEventListener("click", copyLink);
     clear.addEventListener("click", () => {
       input.value = "";
       updateInput();
       input.focus();
     });
+    soundToggle.addEventListener("click", () => {
+      soundEnabled = !soundEnabled;
+      soundToggle.setAttribute("aria-pressed", String(soundEnabled));
+      soundToggle.title = soundEnabled ? "Typing sounds on" : "Typing sounds off";
+      if (soundEnabled) {
+        ensureAudio();
+        playTypingSound("x");
+      }
+    });
+    googleLink.addEventListener("click", event => {
+      event.preventDefault();
+      const query = currentQuery || clean(input.value);
+      if (query) beginRedirect(query, 1150);
+    });
 
     const initialQuery = clean(new URLSearchParams(window.location.search).get("q"));
-    if (initialQuery) {
-      later(() => stageSharedQuery(initialQuery), reducedMotion ? 0 : 500);
-    }
+    if (initialQuery) later(() => stageSharedQuery(initialQuery), reducedMotion ? 0 : 500);
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
