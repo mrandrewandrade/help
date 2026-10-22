@@ -38,6 +38,7 @@
     if (!app || !form || !input) return;
 
     const submit = form.querySelector('[type="submit"]');
+    const searchBox = form.querySelector(".search-box");
     const copy = document.querySelector("[data-copy]");
     const clear = document.querySelector("[data-clear]");
     const soundToggle = document.querySelector("[data-sound]");
@@ -121,7 +122,7 @@
         const swap = Math.floor(Math.random() * (index + 1));
         [pool[index], pool[swap]] = [pool[swap], pool[index]];
       }
-      return ["Booting up the server…", ...pool.slice(0, 7), "Preparing one expertly phrased search…", "Rewriting to teh original question…", FINAL_LINE];
+      return ["Booting up the server…", pool[0], "Preparing one expertly phrased search…", "Rewriting to teh original question…", FINAL_LINE];
     }
 
     function setProgress(value) {
@@ -142,6 +143,12 @@
       const bounds = element.getBoundingClientRect();
       cursorTargetX = bounds.left + bounds.width * xRatio;
       cursorTargetY = bounds.top + bounds.height * yRatio;
+    }
+
+    function parkCursorBelowSearch() {
+      const bounds = searchBox.getBoundingClientRect();
+      cursorTargetX = Math.max(8, bounds.left - 12);
+      cursorTargetY = bounds.bottom + 24;
     }
 
     function beginRedirect(query, delay = 1500) {
@@ -179,7 +186,7 @@
         if (index >= message.length) {
           line.classList.remove("is-active");
           line.classList.add("is-complete");
-          later(onComplete, 900);
+          later(onComplete, 450);
           return;
         }
         const character = message[index];
@@ -187,19 +194,19 @@
         if (index % 2 === 0) playTypingSound(character);
         index += 1;
         statusLog.scrollTop = statusLog.scrollHeight;
-        later(typeNext, reducedMotion ? 2 : 24 + Math.random() * 28);
+        later(typeNext, reducedMotion ? 2 : 18 + Math.random() * 18);
       };
       typeNext();
     }
 
     function runStatuses(query, messages, index) {
       if (index >= messages.length) {
-        beginRedirect(query, 2200);
+        beginRedirect(query, 1300);
         return;
       }
       setProgress(((index + 1) / messages.length) * 100);
       appendStatus(messages[index], () => {
-        later(() => runStatuses(query, messages, index + 1), index === messages.length - 1 ? 1700 : 250);
+        later(() => runStatuses(query, messages, index + 1), index === messages.length - 1 ? 700 : 100);
       });
     }
 
@@ -234,15 +241,13 @@
       if (!reducedMotion && finePointer && brandCursor) {
         cursorAutopilot = true;
         cursorResponsiveness = 0.085;
-        moveCursorTo(processor, 0.08, 0.08);
-        later(() => { cursorTargetY += 8; }, 330);
+        parkCursorBelowSearch();
         later(() => {
-          cursorTargetY -= 8;
           cursorAutopilot = false;
           startThinking(query);
-        }, 850);
+        }, 500);
       } else {
-        later(() => startThinking(query), reducedMotion ? 0 : 350);
+        later(() => startThinking(query), reducedMotion ? 0 : 200);
       }
     }
 
@@ -251,9 +256,9 @@
         later(() => {
           cursorResponsiveness = 0.075;
           moveCursorTo(submit);
-        }, 650);
-        later(() => { cursorTargetY += 6; }, 1450);
-        later(() => demonstrate(query), 1750);
+        }, 350);
+        later(() => { cursorTargetY += 6; }, 800);
+        later(() => demonstrate(query), 1000);
         return;
       }
 
@@ -281,13 +286,13 @@
       cursorResponsiveness = 0.08;
       brandCursor.classList.add("is-autopilot");
 
-      later(() => moveCursorTo(input, 0.28), 450);
-      later(() => { cursorTargetY += 7; }, 1450);
+      later(() => moveCursorTo(input, 0.28), 350);
+      later(() => { cursorTargetY += 7; }, 900);
       later(() => {
         cursorTargetY -= 7;
         input.focus();
         typeSharedQuery(query);
-      }, 1750);
+      }, 1100);
     }
 
     async function copyLink() {

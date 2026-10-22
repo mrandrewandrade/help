@@ -168,7 +168,7 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .powered-by strong { color: #5f6368; font-weight: 500; }
 .powered-by span { display: block; }
 
-.processor { margin: 2.3rem auto 0; max-width: 600px; }
+.processor { margin: 1rem auto 0; max-width: 600px; }
 .processor-heading {
   align-items: center;
   color: var(--muted);
@@ -190,13 +190,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 }
 .status-log {
   display: grid;
-  gap: .62rem;
+  gap: .42rem;
   margin: 0;
-  max-height: 220px;
   min-height: 2.8em;
-  overflow-y: auto;
   padding: .05rem .15rem .1rem 0;
-  scroll-behavior: smooth;
 }
 .status-line {
   align-items: baseline;
@@ -231,6 +228,10 @@ button, a { -webkit-tap-highlight-color: transparent; }
 .app[data-state="searching"] .wordmark h1 { letter-spacing: .08em; transform: scale(1.07); }
 .app[data-state="searching"] .definition { opacity: 0; }
 .app[data-state="searching"] .system-result { opacity: 1; transform: translate(-50%, 0); }
+.app[data-state="working"] .actions,
+.app[data-state="working"] .powered-by,
+.app[data-state="searching"] .actions,
+.app[data-state="searching"] .powered-by { display: none; }
 
 .brand-cursor {
   --cursor-spin-speed: .72s;
